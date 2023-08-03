@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visualizador de XML Transformation </title>
+    <style>
+        .header {
+            display: inline;
+            padding: 3px;
+        }
+        h1 {
+            display: inline;
+        }
+        h6 {
+            display: inline;
+            float: right;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 0px;
+        }
+        .input-container,
+        .output-html {
+            width: calc(33.33% - 10px);
+            position: relative;
+        }
+        #maincointain {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 0px;
+            width: 100%;
+            /* Set the width to 100% */
+        }
+        .input-container h3 {
+            margin-top: 0;
+        }
+        .icon-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .icon-container input[type="file"] {
+            display: none;
+        }
+        .icon-container label {
+            cursor: pointer;
+        }
+        #output {
+            width: 100%;
+            height: 200px;
+            overflow-y: scroll;
+            padding: 3px;
+        }
+        #xml-input-textarea,
+        #xslt-input-textarea {
+            width: 100%;
+            height: 200px;
+        }
+        #html-view {
+            height: 100%;
+        }
+        textarea,
+        #html-view {
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            float: right;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        function transformXML() {
+            var xml = document.getElementById('xml-input-textarea').value;
+            var xslt = document.getElementById('xslt-input-textarea').value;
+            var output = document.getElementById('output');
+            var htmlView = document.getElementById('html-view');
+
+            if (window.DOMParser && window.XMLSerializer) {
+                var parser = new DOMParser();
+                var xsltProcessor = new XSLTProcessor();
+                var xmlDocument = parser.parseFromString(xml, 'text/xml');
+                var xsltDocument = parser.parseFromString(xslt, 'text/xml');
+
+                xsltProcessor.importStylesheet(xsltDocument);
+                var transformedDocument = xsltProcessor.transformToDocument(xmlDocument);
+                var serializer = new XMLSerializer();
+                var transformedXML = serializer.serializeToString(transformedDocument);
+
+                output.innerText = transformedXML;
+                htmlView.innerHTML = transformedXML;
+            } else {
+                output.innerText = 'Your browser does not support XML transformations.';
+                htmlView.innerText = 'Your browser does not support XML transformations.';
+            }
+        }
+
+        function selectLocalXMLFile() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xml';
+            input.onchange = function(event) {
+                var file = event.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function() {
+                    document.getElementById('xml-input-textarea').value = reader.result;
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function selectAllXML() {
+            document.getElementById('xml-input-textarea').select();
+        }
+
+        function eraseXMLContent() {
+            document.getElementById('xml-input-textarea').value = '';
+        }
+
+        function selectLocalXSLTFile() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xsl, .xslt';
+            input.onchange = function(event) {
+                var file = event.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function() {
+                    document.getElementById('xslt-input-textarea').value = reader.result;
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function selectAllXSLT() {
+            document.getElementById('xslt-input-textarea').select();
+        }
+
+        function eraseXSLTContent() {
+            document.getElementById('xslt-input-textarea').value = '';
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header">
+            <h1>Visualizador de XML Transformation </h1>
+            <h6> Jorge Mancilla 2013&#169</h6>
+        </div>
+    </header>
+    <div class="container" id="maincointain">
+        <div class="input-container">
+            <h3>Enter XML:</h3>
+            <div class="icon-container">
+                <input type="file" id="xml-file-input" onchange="selectLocalXMLFile()" />
+                <label for="xml-file-input" title="Select Local XML File">&#128193;</label>
+                <span title="Select All" onclick="selectAllXML()" style="cursor: pointer;">&#128472;</span>
+                <span title="Erase Content" onclick="eraseXMLContent()" style="cursor: pointer;">&#128465;</span>
+            </div>
+            <textarea id="xml-input-textarea"><?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="oficio_dmr-092.xslt"?>
+<oficio>
+  <header>
+    <logo></logo>
+    <secretaria>Secretar&iacute;a de Innovaci&oacute;n y Gobierno Abierto
+     </secretaria>
+      <oficinagov>Direcci&oacute;n de Mejora Regulatoria
+      </oficinagov>
+  </header>
+  <title>
+    <fecha>03 de junio de 2022
+    </fecha>
+    <oficiodocnum>SIGA/DMR-092/2022
+    </oficiodocnum>
+    <asunto>Dictamen de exenci&oacute;n del An&aacute;lisis de Impacto Regulatorio
+    </asunto>
+  </title>
+  <conrecipient>
+    <recipienttitle>S&Iacute;NDICO SEGUNDO
+    </recipienttitle>
+    <recipientname>FRANCISCO DONACIANO BAHENA SAMPOGNA
+    </recipientname>
+    <titulooficial>COORDINADOR DE LA COMISI&Oacute;N DE GOBERNACI&Oacute;N
+    </titulooficial>
+    <oficina>REGLAMENTACI&Oacute;N Y MEJORA REGULATORIA
+    </oficina>
+  </conrecipient>
+  <body>
+    <parag>Por medio del presente reciba un cordial a saludo y a su vez en respuesta al oficio 126-J/2022 recibido el d&iacute;a 31 de mayo del año en curso, me permito informarle que fue analizado el formato de exenci&oacute;n CMU-PLC-55 adjunto y, con fundamento en el art&iacute;culo 71 p&aacute;rrafo s&eacute;ptimo de la Ley General de Mejora Regulatoria, art&iacute;culo 30 p&aacute;rrafo octavo de la Ley para la Mejora Regulatoria y la Simplificaci&oacute;n Administrativa del Estado de Nuevo Le&oacute;n y el art&iacute;culo 14 p&aacute;rrafo sexto del Reglamento para la Mejora Regulatoria y Simplificaci&oacute;n Administrativa del Municipio de Monterrey, la iniciativa de reformar por adici&oacute;n y modificaci&oacute;n del <bold>"Reglamento para Regular el Acceso Vial y Mejorar la Seguridad de los Vecinos en el Municipio de Monterrey" </bold>, se exime la obligaci&oacute;n de elaborar el An&aacute;lisis de Impacto Regulatorio de acuerdo a lo siguiente:
+    </parag>
+    <parag>
+      <clasu1>Advierte que con dicha iniciativa se pretende homologar el Reglamento Municipal a la Ley para Regular el Acceso Vial y Mejorar la Seguridad de los vecinos en el Estado de Nuevo Le&oacute;n
+      </clasu1>
+      <clasu2>No genera costos de cumplimiento para los ciudadanos, pues busca simplificar la autorizaci&oacute;n Municipal para solicitar la restricci&oacute;n temporal de la v&iacute;a p&uacute;blica
+      </clasu2>
+      <clasu3>Prev&eacute; salvaguardar la seguridad de los vecinos mediante una coordinaci&oacute;n entre la seguridad privada de la colonia que solicita la reestricci&oacute;n y la Secretaria de Seguridad y Protecci&oacute;n a la Ciudadan&iacute;a del Municipio con la finalidad de tener contacto oportuno y eficiente.
+      </clasu3>
+    </parag>
+    <parag>Adicional a lo anterior la Direcci&oacute;n de Asuntos Jur&iacute;dicos de la Secretaria del Ayuntamiento otorgo el visto bueno mediante oficio SAY/DAJ/3056/2022 indicando que, no tiene observaciones respecto a la presente iniciativa de expedici&oacute;n.
+    </parag>
+    <parag>Como resultado de lo expuesto, esta Direcci&oacute;n de Mejora Regulatoria <bold>dictamina como procedente la exenci&oacute;n de la obligaci&oacute;n de elaborar el An&aacute;lisis de Impacto Regulatorio (AIR)</bold>, respecto a la iniciativa de reforma por adici&oacute;n y modificaci&oacute;n al Reglamento de Regular el Acceso Vial y Mejorar la seguridad de los Vecinos en el Municipio de Monterrey.
+    </parag>
+    <parag>Adem&aacute;s, le informo que el presente dictamen estar&aacute; en consulta p&uacute;blica dentro del portal oficial de mejora regulatoria en el apartado de consulta p&uacute;blica, el cual podr&aacute; consultar en la liga: <url>http://monterrey.gob.mx/MejoraRegulatoria_ConsultaPublica.asp</url>, en un periodo de 20 d&iacute;as h&aacute;biles de conformidad a lo establecido  en el art&iacute;culo 73 de la Ley General de Mejora Regulatoria.
+    </parag>
+    <parag>Sin otro particular por el momento, quedo a sus &oacute;rdenes para cualquier duda o aclaraci&oacute;n al respecto.
+    </parag>
+  </body>
+  <cierre>
+    <despedida>ATENTAMENTE
+    </despedida>
+    <consigner>
+      <esigndata>
+      </esigndata>
+      <signertitle>LIC.
+      </signertitle>
+      <signername>DULCE ALEJANDRA GUERRERO CAVAZOS
+      </signername>
+      <signertitulooficial>DIRECTORA DE MEJORA REGULATORIA
+      </signertitulooficial>
+      <oficina>SECRETARIA DE INNOVACI&Oacute;N Y GOBIERNO ABIERTO
+      </oficina>
+    </consigner>
+  </cierre>
+  <ccps>
+   <ccp1>
+     <ccptitle>Lic.
+     </ccptitle>
+     <ccpname>Jos&eacute; Antonio G&oacute;mez Villareal
+     </ccpname>
+     <ccptitulooficial>Director de Asuntos Jur&iacute;dicos
+     </ccptitulooficial>
+     <ccpoficina> Secretar&iacute;a de Ayuntamiento
+     </ccpoficina>
+   </ccp1>
+   <ccp2>
+     <ccptitle>LIC..
+     </ccptitle>
+     <ccpname>Rosa Mar&iacute;a V&aacute;zquez Reyes
+     </ccpname>
+     <ccptitulooficial>Directora de Gobierno y Asuntos Pol&iacute;ticos
+     </ccptitulooficial>
+     <ccpoficina>
+     </ccpoficina>
+   </ccp2>
+  </ccps>
+  <footer>
+    <qrs>
+     <qrxml>
+     <url>https://svgshare.com/i/v7r.svg
+     </url>
+    </qrxml>
+      <qrhtml>
+        <url>https://svgshare.com/i/v8N.svg
+        </url>
+      </qrhtml>
+    </qrs>
+  </footer>
+</oficio>
+</textarea>
+        </div>
+        <div class="input-container">
+            <h3>Enter XSLT:</h3>
+            <div class="icon-container">
+                <input type="file" id="xslt-file-input" onchange="selectLocalXSLTFile()" />
+                <label for="xslt-file-input" title="Select Local XSLT File">&#128193;</label>
+                <span title="Select All" onclick="selectAllXSLT()" style="cursor: pointer;">&#128472;</span>
+                <span title="Erase Content" onclick="eraseXSLTContent()" style="cursor: pointer;">&#128465;</span>
+            </div>
+            <textarea id="xslt-input-textarea"><xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+  <xsl:template match="/">
+    <html>
+      <head>
+        <style>
+          /* CSS styles for formatting */
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1;
+          }
+         .head {
+         display: flex;
+         justify-content: space-between; 
+         align-items: center; 
+          margin-bottom: 5px;
+         }
+        .logo {
+         display: flex; /* Use flexbox for horizontal alignment */
+        align-items: center; /* Vertically align the content */
+        }
+        #logoimg {
+       padding: 25px;
+       }
+      .header {
+       font-weight: bold;
+        font-size: 14pt;
+        text-align: right;
+       }
+          .title {
+            text-align: right;
+            margin-bottom: 10px;
+            margin-left:300px;
+            font-size: 12pt;
+            font-weight: bold;
+            
+          }
+          .recipient {
+            margin-bottom: 10px;
+          font-weight: bold;
+          margin-block-end: 5px; 
+          writing-mode: horizontal-tb;
+          }
+          .body {
+            margin-bottom: 10px;
+          }
+          p {
+           margin: 5px;
+          }
+          .bold {
+            font-weight: bold;
+          }
+          .bold-text {
+            font-weight: bold;
+          }
+           .justified {
+            text-align: justify;
+          }
+          .closing {
+            margin-top: 20px;
+            font-weight: bold;
+             text-align: center;
+           }
+          .ccp {
+           font-size: 8pt;
+           font-weight: bold;
+          }
+         .qr {
+          display: flex;
+         align-items: center;
+          justify-content: center;
+           text-align: center;
+           }
+               
+        </style>
+      </head>
+      <body>
+        <xsl:apply-templates select="oficio"/>
+      </body>
+    </html>
+  </xsl:template>
+
+  <xsl:template match="oficio">
+    <div class="head">
+      <div class="logo">
+      <img src="https://svgshare.com/i/vL5.svg"  width="35%" id="logoimg" alt="logomty" />
+      </div>
+       <div class="header">
+      <xsl:apply-templates select="header"/>
+    </div>
+</div>
+    <div class="title">
+      <xsl:apply-templates select="title"/>
+    </div>
+    <div class="recipient">
+      <xsl:apply-templates select="conrecipient"/>
+    </div>
+    <div class="body">
+      <xsl:apply-templates select="body"/>
+    </div>
+    <div class="closing">
+      <xsl:apply-templates select="cierre"/>
+    </div>
+    <div class="ccp">
+      <xsl:apply-templates select="ccps"/>
+    </div>
+    <div class="qr">
+     <xsl:apply-templates select="qrs"/>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="header">
+    <xsl:apply-templates select="secretaria"/>
+    <xsl:apply-templates select="oficinagov"/>
+  </xsl:template>
+
+  <xsl:template match="secretaria">
+    <p>
+     <xsl:value-of select="normalize-space(.)"/>
+    </p>
+  </xsl:template>
+
+  <xsl:template match="oficinagov">
+    <p>
+     <xsl:value-of select="normalize-space(.)"/>
+    </p>
+  </xsl:template>
+
+
+  <xsl:template match="title">
+    <p>
+      <xsl:apply-templates select="fecha"/>
+    </p>
+    <p> 
+      <xsl:text>No. De Oficio: </xsl:text><xsl:apply-templates select="oficiodocnum"/>
+    </p>
+    <p>
+      <xsl:text>Asunto: </xsl:text><xsl:apply-templates select="asunto"/>
+    </p><br/><br/>
+  </xsl:template>
+
+  <xsl:template match="fecha | oficiodocnum | asunto">
+    <xsl:value-of select="normalize-space(.)"/>
+  </xsl:template>
+
+  <xsl:template match="conrecipient">
+    <p>
+      <xsl:apply-templates select="recipienttitle"/>&#160;
+      <xsl:apply-templates select="recipientname"/>
+    </p>
+    <p>
+      <xsl:apply-templates select="titulooficial"/><xsl:text>, </xsl:text>
+    </p>
+    <p>
+      <xsl:apply-templates select="oficina"/>
+    </p> <p><xsl:text> PRESENTE. - </xsl:text></p><br/><br/>
+  </xsl:template>
+
+  <xsl:template match="recipienttitle | recipientname | titulooficial | oficina">
+    <xsl:value-of select="normalize-space(.)"/>
+  </xsl:template>
+
+  <xsl:template match="body">
+    <xsl:apply-templates select="parag"/>
+  </xsl:template>
+
+  <xsl:template match="parag">
+    <p class="justified">
+      <xsl:apply-templates/>
+    </p><br/>
+  </xsl:template>
+ <xsl:template match="bold">
+    <span class="bold">
+      <xsl:apply-templates/>
+    </span>
+  </xsl:template>
+<xsl:template match="url">
+    <a href="{.}">
+      <xsl:value-of select="."/>
+    </a>
+  </xsl:template>
+
+  <xsl:template match="clasu1">
+   <p >
+     <span style="font-weight: bold;">
+      <xsl:text>PRIMERO. -</xsl:text> 
+     </span>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="normalize-space(.)"/><br/><br/>
+   </p>
+  </xsl:template>
+
+ <xsl:template match="clasu2">
+      <p >
+     <span style="font-weight: bold;">
+      <xsl:text>SEGUNDO. -</xsl:text> 
+     </span>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="normalize-space(.)"/><br/><br/>
+   </p>
+  </xsl:template>
+
+ <xsl:template match="clasu3">
+       <p >
+     <span style="font-weight: bold;">
+      <xsl:text>TERCERO. -</xsl:text> 
+     </span>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="normalize-space(.)"/><br/><br/>
+   </p>
+  </xsl:template>
+
+
+  <xsl:template match="cierre">
+    <xsl:apply-templates select="despedida"/>
+    <xsl:apply-templates select="consigner"/>
+  </xsl:template>
+
+  <xsl:template match="despedida">
+    <p><br/><br/><br/>
+      <xsl:value-of select="normalize-space(.)"/>
+    </p>
+  </xsl:template>
+
+  <xsl:template match="consigner">
+    <p>
+      <xsl:apply-templates select="esigndata"/><img src="https://svgshare.com/i/vLv.svg" width="150"  alt="esignature" />
+    </p>
+    <p>
+      <xsl:apply-templates select="signertitle"/>
+   
+      <xsl:apply-templates select="signername"/>
+    </p>
+    <p>
+      <xsl:apply-templates select="signertitulooficial"/>
+    </p>
+    <p>
+      <xsl:apply-templates select="oficina"/>
+    </p>
+<br/><br/><br/><br/><br/><br/><br/><br/>
+  </xsl:template>
+
+  <xsl:template match="esigndata | signertitle | signername | signertitulooficial | oficina">
+    <xsl:value-of select="normalize-space(.)"/>
+    <xsl:text>&#10;</xsl:text>
+     
+  </xsl:template>
+
+  <xsl:template match="ccps">
+    <xsl:text>MMG </xsl:text>
+    <xsl:apply-templates select="ccp1 | ccp2"/><br/><br/><br/><br/><br/>
+  <div class="qr">
+ <div>
+<img src="https://svgshare.com/i/v7r.svg" width="150"  alt="XMLQR" />
+<p>QR de XML</p>
+ </div>
+ <div>
+     <img src="https://svgshare.com/i/v8N.svg" width="150"  alt="HTMLQR" />
+<p>QR de HTML</p>
+ </div>
+</div>
+  </xsl:template>
+
+  <xsl:template match="ccp1 | ccp2">
+   <p>
+      <xsl:text>c.c.p. </xsl:text><xsl:apply-templates select="ccptitle"/>&#160; 
+      <xsl:apply-templates select="ccpname"/> &#160;
+      <xsl:apply-templates select="ccptitulooficial"/> &#160;
+      <xsl:apply-templates select="ccpoficina"/>
+    </p>
+  </xsl:template>
+
+  <xsl:template match="ccptitle | ccpname | ccptitulooficial | ccpoficina">
+    <xsl:value-of select="normalize-space(.)"/>
+  </xsl:template>
+ 
+   <xsl:template match="qrs">
+<div>
+     <img src="https://svgshare.com/i/v7r.svg" width="150"  alt="XMLQR" />
+     <img src="https://svgshare.com/i/v8N.svg" width="150"  alt="HTMLQR" />
+    </div>
+    </xsl:template>
+
+</xsl:stylesheet>
+</textarea>
+            <button onclick="transformXML()">Transformar</button>
+        </div>
+        <div class="output-html">
+            <h3>Salida Codigo HTML:</h3>
+            <textarea id="output" width="33.33%"></textarea>
+        </div>
+    </div>
+    <div class="container">
+        <div class="html-view">
+            <h3>Vista HTML :</h3>
+            <div id="html-view"></div>
+        </div>
+    </div>
+</body>
+</html>
